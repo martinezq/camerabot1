@@ -11,7 +11,7 @@ class Driver:
 		self.pid = PID(0.01, 0.0, 0.00, setpoint=0)
 		self.pid.output_limits = (-1.0, 1.0)
 
-		self.stop()
+		self.off()
 
 	def stop(self):
 		self.motorL.stop()
@@ -28,7 +28,7 @@ class Driver:
 	def track(self, error = 0):
 		control = self.pid(error)		
 		acontrol = abs(control)
-		print(str(error) + " -> " + str(control))
+		# print(str(error) + " -> " + str(control))
 
 		if control > 0:
 			self.motorL.forward(acontrol)
