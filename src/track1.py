@@ -16,14 +16,27 @@ args = vars(ap.parse_args())
 vision = Vision(debug = args["display"])
 
 # init drive
-driver = Driver()
+driver = Driver(maxSpeed = 0.4)
 
 driver.on()
 
+P = 0.01
+D = 0.001
+I = 0.00001
+
 try:
+	lastError = 0
+	integral = 0
 	while True:
-		output = vision.process_frame()
-		driver.track(output)		
+		error = vision.process_frame()
+		integral += error
+		
+		turn = P * error + D * (error - lastError) + I * integral
+		lastError = error
+
+		print(str(error) + " -> " + str(turn))
+
+		driver.track(turn)		
 
 except KeyboardInterrupt:
 	print("stop")

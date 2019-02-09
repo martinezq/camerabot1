@@ -16,12 +16,12 @@ class Vision:
 		self.vs.stop()
 
 	def process_frame(self):
-		print("frame")
+		# print("frame")
 
 		frame = self.vs.read()
 
 		gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-		ret,thresholded = cv2.threshold(gray, 32, 255, cv2.THRESH_BINARY)
+		ret,thresholded = cv2.threshold(gray, 63, 255, cv2.THRESH_BINARY)
 
 		output = 0
 
@@ -37,11 +37,13 @@ class Vision:
 
 		return output
 
-	def calcualteError(self, img, canvas, size = 16):
-		levelRef = 180
+	def calcualteError(self, img, canvas):
+		levelRef = 220
 		
 		width = img.shape[0]
 		height = img.shape[1]
+
+		size = width / 4
 
 		error = 0
 
@@ -59,7 +61,8 @@ class Vision:
 				cv2.rectangle(canvas, (x1, y), (x2, y + size), (0, 255, 0), 2)
 				cx = (x1 + x2) / 2
 				de = cx - width/2
-				error += de * (height - y) / size
+				error += de #* (height - y) / size
+				break
 
 		cv2.line(canvas, (width/2, height), (width/2 + error/10, 0), (0, 0, 255), 2)
 		return error
