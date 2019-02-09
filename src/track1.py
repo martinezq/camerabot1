@@ -18,7 +18,7 @@ vision = Vision(debug = args["display"])
 # init drive
 driver = Driver()
 
-#driver.on()
+driver.on()
 
 try:
 	while True:

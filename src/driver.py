@@ -8,7 +8,7 @@ class Driver:
 		self.motorL = Motor(24, 23)
 		self.motorR = Motor(6, 5)
 
-		self.pid = PID(0.01, 0.0, 0.00, setpoint=0)
+		self.pid = PID(0.01, 0.0, 0.0, setpoint=0)
 		self.pid.output_limits = (-1.0, 1.0)
 
 		self.off()
@@ -28,11 +28,16 @@ class Driver:
 	def track(self, error = 0):
 		control = self.pid(error)		
 		acontrol = abs(control)
-		# print(str(error) + " -> " + str(control))
+		print(str(error) + " -> " + str(control))
 
-		if control > 0:
-			self.motorL.forward(acontrol)
-			self.motorR.backward(acontrol)
+		speed = 0.2
+
+		if control == 0:
+			self.motorL.forward(speed)
+			self.motorR.forward(speed)
+		elif control > 0:
+			self.motorL.forward(speed)
+			self.motorR.backward(acontrol * 0.2)
 		else:
-			self.motorL.backward(acontrol)
-			self.motorR.forward(acontrol)
+			self.motorL.backward(acontrol * 0.2)
+			self.motorR.forward(speed)

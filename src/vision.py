@@ -17,89 +17,52 @@ class Vision:
 
 	def process_frame(self):
 		print("frame")
+
 		frame = self.vs.read()
-		wrapped = self.perspective_warp(frame)
-		gray = cv2.cvtColor(wrapped, cv2.COLOR_BGR2GRAY)
+
+		gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 		ret,thresholded = cv2.threshold(gray, 32, 255, cv2.THRESH_BINARY)
-		
-		kernel = np.ones((5, 5),np.uint8)
-		erosion = cv2.erode(thresholded, kernel, iterations = 1)
 
 		output = 0
 
-		self.mark(erosion, wrapped)
+		base = thresholded
+		canvas = frame
+
+		output = self.calcualteError(base, canvas)
 
 		if self.debug == 1:
-			cv2.imshow("Frame", wrapped)
-			# cv2.imshow("Frame2", thresholded)
+			cv2.imshow("Frame", canvas)
+			cv2.imshow("Frame2", base)
 			key = cv2.waitKey(1) & 0xFF
 
 		return output
 
-	def mark(self, img, canvas, x1 = 0, y1 = 0, x2 = None, y2 = None, val = None):
-		if x2 is None:
-			x2 = self.width
-
-		if y2 is None:
-			y2 = self.height * 2
+	def calcualteError(self, img, canvas, size = 16):
+		levelRef = 180
 		
-		size = x2 - x1
+		width = img.shape[0]
+		height = img.shape[1]
 
-		if val is None:
-			val = np.mean(img, axis=(0, 1))
-		
-		# print(str(val))
+		error = 0
 
-		mx = (x2+x1) / 2
-		my = (y2+y1) / 2
+		for y in range(0, width, size):
+			x1 = -1
+			x2 = -1
+			for x in range(0, height, size / 2):
+				level = img[y:y+size, x:x+size].mean(axis=0).mean(axis=0)
+				if level < levelRef and x1 == -1:
+					x1 = x
+				if level < levelRef and x1 > -1:
+					x2 = x
+			
+			if x1 > -1:
+				cv2.rectangle(canvas, (x1, y), (x2, y + size), (0, 255, 0), 2)
+				cx = (x1 + x2) / 2
+				de = cx - width/2
+				error += de * (height - y) / size
 
-		mmx1 = (mx + x1) / 2
-		mmx2 = (mx + x2) / 2
-		mmy1 = (my + y1) / 2
-		mmy2 = (my + y2) / 2
-
-		lt = rt = lb = rb = md = 0
-
-		if size > 16:
-			lt = img[y1:my, x1:mx].mean(axis=0).mean(axis=0)
-			rt = img[y1:my, mx:x2].mean(axis=0).mean(axis=0)
-			lb = img[my:y2, x1:mx].mean(axis=0).mean(axis=0)
-			rb = img[my:y2, mx:x2].mean(axis=0).mean(axis=0)
-			md = img[mmy1:mmy2, mmx1:mmx2].mean(axis=0).mean(axis=0)
-
-		if lt > val:
-			self.mark(img, canvas, x1, y1, mx, my, lt)	
-		
-		if rt > val:
-			self.mark(img, canvas, mx, y1, x2, my, rt)
-
-		if lb > val:
-			self.mark(img, canvas, x1, my, mx, y2, lb)
-
-		if rb > val:
-			self.mark(img, canvas, mx, my, x2, y2, rb)
-
-		if md > val:
-			self.mark(img, canvas, mmx1, mmy1, mmx2, mmy2, md)
-
-		if max(lt, rt, lb, rb, md) <= val:
-		# if val > 200:
-			cv2.rectangle(canvas, (x1, y1), (x2, y2), (0, 255, 0), 2)
-
-		return val
-
-	def perspective_warp(self, img):
-		src=np.float32([(0, 0.25), (1, 0.25), (0, 1), (1, 1)]),
-		dst=np.float32([(-0.3, 0), (1.3, 0), (0, 1), (1,1)])
-		dst_size=(self.width, self.height * 2)
-		
-		img_size = np.float32([(img.shape[1],img.shape[0])])
-		src = src * img_size
-		dst = dst * np.float32(dst_size)
-		M = cv2.getPerspectiveTransform(src, dst)
-		warped = cv2.warpPerspective(img, M, dst_size)
-		
-		return warped
+		cv2.line(canvas, (width/2, height), (width/2 + error/10, 0), (0, 0, 255), 2)
+		return error
 
 def sliding_window(image, stepSize, windowSize):
 	# slide a window across the image
