@@ -71,7 +71,7 @@ class Vision:
 				break
 
 		if self.debug == 1:
-			cv2.line(canvas, (width/2, height), (width/2 + error/10, 0), (0, 0, 255), 2)
+			cv2.line(canvas, (width/2, height), (width/2 + int(error/10), 0), (0, 0, 255), 2)
 		
 		return error
 

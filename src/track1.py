@@ -5,6 +5,14 @@ import argparse
 from vision import Vision
 from driver import Driver
 import time
+import sys
+import signal
+
+def sigterm_handler(_signo, _stack_frame):
+    # Raises SystemExit(0):
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, sigterm_handler)
 
 print("start")
 
@@ -17,12 +25,12 @@ args = vars(ap.parse_args())
 vision = Vision(debug = args["display"])
 
 # init drive
-driver = Driver(maxSpeed = 0.8)
+driver = Driver(maxSpeed = 0.4)
 
 driver.on()
 
-P = 0.0045
-D = 0.0005
+P = 0.0040
+D = 0.0000
 I = 0.0000
 
 try:
@@ -57,9 +65,8 @@ try:
 		print(str(error) + " -> " + str(turn) + " FPS = " + str(fps))
 
 
-except KeyboardInterrupt:
+finally:
 	print("stop")
 	driver.off()
 	vision.destroy()
 	pass
-

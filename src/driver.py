@@ -3,17 +3,14 @@ from gpiozero import Motor, LED
 
 class Driver:
 	def __init__(self, maxSpeed = 1.0, acc = 0.005):
-		self.motorRE = LED(18)
-		self.motorLE = LED(13)
-		self.motorR = Motor(24, 23)
-		self.motorL = Motor(6, 5)
+		self.motorLE = LED(18)
+		self.motorRE = LED(13)
+		self.motorL = Motor(24, 23)
+		self.motorR = Motor(6, 5)
 
 		self.maxSpeed = maxSpeed
 		self.acc = acc
 		self.actualSpeed = 0.2
-
-		# self.pid = PID(0.01, 0.0, 0.0, setpoint=0)
-		# self.pid.output_limits = (-1.0, 1.0)
 
 		self.off()
 
@@ -34,7 +31,7 @@ class Driver:
 		targetSpeed = max(0.25, self.maxSpeed - abs(turn)/2)
 
 		if targetSpeed < self.actualSpeed:
-			self.actualSpeed -= 4 * self.acc
+			self.actualSpeed -= 2 * self.acc
 		else:
 			self.actualSpeed += self.acc
 
