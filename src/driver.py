@@ -2,7 +2,7 @@ from gpiozero import Motor, LED
 # from simple_pid import PID
 
 class Driver:
-	def __init__(self, maxSpeed = 1.0, acc = 0.005):
+	def __init__(self, maxSpeed = 1.0, acc = 0.01):
 		self.motorLE = LED(18)
 		self.motorRE = LED(13)
 		self.motorL = Motor(24, 23)
@@ -26,29 +26,13 @@ class Driver:
 		self.motorLE.off()
 		self.motorRE.off()
 
-	def track(self, turn = 0, speed = 1):
+	def track(self, turn = 0):
 
-		targetSpeed = max(0.25, self.maxSpeed - abs(turn)/2)
+		speedL = self.maxSpeed + turn
+		speedR = self.maxSpeed - turn
 
-		if targetSpeed < self.actualSpeed:
-			self.actualSpeed -= 2 * self.acc
-		else:
-			self.actualSpeed += self.acc
-
-		self.actualSpeed = min(self.maxSpeed, self.actualSpeed)
-
-		motorSpeed = min(speed, self.actualSpeed)
-		dif = min(abs(turn), self.actualSpeed) * 2
-
-		speedL = motorSpeed
-		speedR = motorSpeed
-
-		if turn > 0:
-			speedR = motorSpeed - dif
-		elif turn < 0:
-			speedL = motorSpeed - dif
-		
-		# print("turn = " + str(turn) + ", l = " + str(speedL) + ", r = " + str(speedR))
+		speedL = max(0, min(speedL, self.maxSpeed))
+		speedR = max(0, min(speedR, self.maxSpeed))
 
 		self.motorMove(self.motorL, speedL)
 		self.motorMove(self.motorR, speedR)

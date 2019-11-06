@@ -22,7 +22,7 @@ class Vision:
 		frame = self.vs.read()
 
 		gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-		ret,thresholded = cv2.threshold(gray, 32, 255, cv2.THRESH_BINARY)
+		ret,thresholded = cv2.threshold(gray, 64, 255, cv2.THRESH_BINARY)
 
 		output = 0
 

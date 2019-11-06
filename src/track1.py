@@ -25,12 +25,12 @@ args = vars(ap.parse_args())
 vision = Vision(debug = args["display"])
 
 # init drive
-driver = Driver(maxSpeed = 0.4)
+driver = Driver(maxSpeed = 0.6)
 
 driver.on()
 
-P = 0.0040
-D = 0.0000
+P = 0.0300
+D = 0.0040
 I = 0.0000
 
 try:
